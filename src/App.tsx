@@ -18,7 +18,12 @@ function App() {
         <ObjectWater></ObjectWater>
 
         <Suspense fallback={null}>
-          <Gltf scale={1} src={`/config/hongkong-transformed.glb`}></Gltf>
+          <Gltf
+            castShadow
+            receiveShadow
+            scale={1}
+            src={`/config/hongkong-transformed.glb`}
+          ></Gltf>
 
           <OrbitControls
             //
