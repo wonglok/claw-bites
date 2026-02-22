@@ -101,50 +101,50 @@ export function BloomPipeline() {
 
     //
     object.sunLight.shadow.intensity = 2;
-    object.sunLight.intensity = 1.5;
+    object.sunLight.intensity = 1.0;
     object.moonLight.shadow.intensity = 2;
-    object.moonLight.intensity = 1.5;
+    object.moonLight.intensity = 1.0;
 
     const scenePass = pass(scene, camera);
     scenePass.setMRT(
       mrt({
         output: output,
-        normal: directionToColor(normalView),
-        metalrough: vec2(metalness, roughness), // pack metalness and roughness into a single attachment
+        // normal: directionToColor(normalView),
+        // metalrough: vec2(metalness, roughness), // pack metalness and roughness into a single attachment
       }),
     );
 
     const scenePassColor = scenePass
       .getTextureNode("output")
       .toInspector("Color");
-    const scenePassNormal = scenePass
-      .getTextureNode("normal")
-      .toInspector("Normal", (node) => {
-        return colorSpaceToWorking(node, SRGBColorSpace);
-      });
 
-    const scenePassDepth = scenePass
-      .getTextureNode("depth")
-      .toInspector("Depth", () => {
-        return scenePass.getLinearDepthNode();
-      });
-    const scenePassMetalRough = scenePass
-      .getTextureNode("metalrough")
-      .toInspector("Metalness-Roughness");
+    // const scenePassNormal = scenePass
+    //   .getTextureNode("normal")
+    //   .toInspector("Normal", (node) => {
+    //     return colorSpaceToWorking(node, SRGBColorSpace);
+    //   });
+
+    // const scenePassDepth = scenePass
+    //   .getTextureNode("depth")
+    //   .toInspector("Depth", () => {
+    //     return scenePass.getLinearDepthNode();
+    //   });
+    // const scenePassMetalRough = scenePass
+    //   .getTextureNode("metalrough")
+    //   .toInspector("Metalness-Roughness");
+    // const sceneNormal = sample((uv) => {
+    //   return colorToDirection(scenePassNormal.sample(uv));
+    // });
+
+    //
 
     // optional: optimize bandwidth by reducing the texture precision for normals and metal/roughness
 
-    const normalTexture = scenePass.getTexture("normal");
-    normalTexture.type = UnsignedByteType;
+    // const normalTexture = scenePass.getTexture("normal");
+    // normalTexture.type = UnsignedByteType;
 
-    const metalRoughTexture = scenePass.getTexture("metalrough");
-    metalRoughTexture.type = UnsignedByteType;
-
-    const sceneNormal = sample((uv) => {
-      return colorToDirection(scenePassNormal.sample(uv));
-    });
-
-    //
+    // const metalRoughTexture = scenePass.getTexture("metalrough");
+    // metalRoughTexture.type = UnsignedByteType;
 
     // const ssrPass = ssr(
     //   scenePassColor,
@@ -185,24 +185,24 @@ export function BloomPipeline() {
     // 	camera,
     // );
 
-    //
-
-    const bloomPass = bloom(scenePassColor, 1.0, 1.0, 0.75);
-
     const postProcessing = new PostProcessing(renderer as any);
 
     const aaColor = fxaa(scenePassColor);
 
-    // .add(ssrPass);
+    const bloomPass = bloom(scenePassColor, 0.5, 1.0, 1.0);
 
     postProcessing.outputNode = add(aaColor, bloomPass.mul(1.0));
 
     postProcessing.needsUpdate = true;
 
     // rgbeLoader.loadAsync(url).then((texture) => {
+    //
     //   texture.mapping = EquirectangularReflectionMapping;
     //   scene.background = texture;
     //   scene.environment = texture;
+    //   useAppState.setState({ visible: true });
+    //
+    // });
 
     setSun(
       <group name="light-player-target">
@@ -215,9 +215,6 @@ export function BloomPipeline() {
         postProcessing.render();
       };
     });
-
-    //   useAppState.setState({ visible: true });
-    // });
 
     return () => {
       postProcessing.dispose();

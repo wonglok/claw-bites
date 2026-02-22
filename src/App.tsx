@@ -6,92 +6,76 @@ import {
   Gltf,
   OrbitControls,
   PerspectiveCamera,
+  Stars,
 } from "@react-three/drei";
-import { DiamindComponent } from "./DiamondTSL/DiamondComponent.tsx";
+// import { DiamindComponent } from "./DiamondTSL/DiamondComponent.tsx";
 import { BloomPipeline } from "./CanvasGPU/BloomPipeline.tsx";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Color, FogExp2, Matrix4, Object3D, Scene } from "three";
 import { color, fog, rangeFog, rangeFogFactor } from "three/tsl";
+import { ObjectWater } from "./Objects/ObjectWater.tsx";
 
-const m4 = new Matrix4().fromArray([
-  0.9840423933287578, 1.0408340855860843e-17, 0.1779341679717821, 0,
-  0.05954104347474225, 0.9423517267593705, -0.3292842043213908, 0,
-  -0.16767657043770076, 0.33462400253662705, 0.9273140485577785, 0,
-  -136.6004999600759, 272.606995275635, 755.4517743435046, 1,
-]);
-
-const o3 = new Object3D();
-m4.decompose(o3.position, o3.quaternion, o3.scale);
-const display = <primitive object={o3}></primitive>;
 function App() {
   return (
     <>
       <CanvasGPU webgpu>
-        <Fog></Fog>
-        {/* <color attach="background" args={["#ffffff"]} /> */}
         <Suspense fallback={null}>
-          {display}
-          {/* <Environment
-            background
-            backgroundIntensity={1.15}
-            files={[`/hdr/sky.hdr`]}
-          /> */}
-
-          {/* <Spinner>
-            <DiamindComponent />
-          </Spinner> */}
-
+          <Fog></Fog>
           <Gltf scale={1} src={`/config/hongkong-transformed.glb`}></Gltf>
-          {/* <PerspectiveCamera
-            fov={50}
-            far={1000}
-            near={1}
-            position={o3.position.toArray()}
-            quaternion={o3.quaternion.toArray()}
-            scale={o3.scale.toArray()}
-          ></PerspectiveCamera> */}
-          <OrbitControls
-            object-position={o3.position.toArray()}
-            object-quaternion={o3.quaternion.toArray()}
-            object-scale={o3.scale.toArray()}
-            makeDefault
-          ></OrbitControls>
-          {/* <OrbitControlsobject-position={[0, 2, 1]} /> */}
 
+          <ObjectWater></ObjectWater>
+
+          <OrbitControls makeDefault></OrbitControls>
+
+          <Environment environmentIntensity={0.5} files={[`/hdr/sky.hdr`]} />
           <BloomPipeline />
         </Suspense>
       </CanvasGPU>
     </>
   );
 }
+
 function Fog() {
+  const camera: any = useThree((r) => r.camera);
   const scene: any = useThree((r) => r.scene);
+
+  useEffect(() => {
+    if (!camera) {
+      return;
+    }
+
+    const m4 = new Matrix4().fromArray([
+      0.9840423933287578, 1.0408340855860843e-17, 0.1779341679717821, 0,
+      0.05954104347474225, 0.9423517267593705, -0.3292842043213908, 0,
+      -0.16767657043770076, 0.33462400253662705, 0.9273140485577785, 0,
+      -136.6004999600759, 272.606995275635, 755.4517743435046, 1,
+    ]);
+
+    const o3 = camera;
+    m4.decompose(o3.position, o3.quaternion, o3.scale);
+
+    camera.fov = 50;
+    camera.far = 15000;
+    camera.near = 5;
+    camera.updateProjectionMatrix();
+  }, [camera]);
+
   useEffect(() => {
     if (!scene) {
       return;
     }
     if (scene) {
+      //
+      const skyColor = "#6df3ff";
       scene.fogNode = fog(
-        color(new Color("#a8a8a8")),
-        rangeFogFactor(300, 1500),
+        color(new Color(skyColor)),
+        rangeFogFactor(1000, 1500),
       );
-      scene.background = new Color("#a7a7a7");
+      scene.backgroundNode = color(new Color(skyColor));
     }
   }, [scene]);
   return null;
 }
 //
-
-function Spinner({ children }: any) {
-  const ref = useRef<any>(null);
-
-  useFrame((_, dt) => {
-    if (ref.current) {
-      ref.current.rotation.y += dt * 0.125;
-    }
-  });
-
-  return <group ref={ref}>{children}</group>;
-}
 
 export default App;
