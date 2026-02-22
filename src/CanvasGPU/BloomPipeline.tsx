@@ -64,12 +64,12 @@ export function BloomPipeline() {
 
     object.sunLight.castShadow = true;
     object.sunLight.shadow.camera.near = 0;
-    object.sunLight.shadow.camera.far = 150 * 2;
+    object.sunLight.shadow.camera.far = 150 * 2 * 100;
 
-    object.sunLight.shadow.camera.left = -5.123 * 8;
-    object.sunLight.shadow.camera.right = 5.123 * 8;
-    object.sunLight.shadow.camera.bottom = -5.123 * 8;
-    object.sunLight.shadow.camera.top = 5.123 * 8;
+    object.sunLight.shadow.camera.left = -5.123 * 8 * 100;
+    object.sunLight.shadow.camera.right = 5.123 * 8 * 100;
+    object.sunLight.shadow.camera.bottom = -5.123 * 8 * 100;
+    object.sunLight.shadow.camera.top = 5.123 * 8 * 100;
 
     object.sunLight.shadow.mapSize.width = 1024;
     object.sunLight.shadow.mapSize.height = 1024;
@@ -87,12 +87,12 @@ export function BloomPipeline() {
 
     object.moonLight.castShadow = false;
     object.moonLight.shadow.camera.near = 0;
-    object.moonLight.shadow.camera.far = 150 * 2;
+    object.moonLight.shadow.camera.far = 150 * 2 * 100;
 
-    object.moonLight.shadow.camera.left = -5.123 * 8;
-    object.moonLight.shadow.camera.right = 5.123 * 8;
-    object.moonLight.shadow.camera.bottom = -5.123 * 8;
-    object.moonLight.shadow.camera.top = 5.123 * 8;
+    object.moonLight.shadow.camera.left = -5.123 * 8 * 100;
+    object.moonLight.shadow.camera.right = 5.123 * 8 * 100;
+    object.moonLight.shadow.camera.bottom = -5.123 * 8 * 100;
+    object.moonLight.shadow.camera.top = 5.123 * 8 * 100;
 
     object.moonLight.shadow.mapSize.width = 1024;
     object.moonLight.shadow.mapSize.height = 1024;

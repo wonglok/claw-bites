@@ -2,6 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import { useEffect, useState } from "react";
 import {
   Color,
+  DoubleSide,
   PlaneGeometry,
   RepeatWrapping,
   TextureLoader,
@@ -32,6 +33,7 @@ export function ObjectWater() {
       ),
     });
 
+    water.material.side = DoubleSide;
     water.position.y = -5;
     water.rotation.x = Math.PI * 0;
 

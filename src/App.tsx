@@ -1,43 +1,63 @@
 import "./App.css";
-import { Suspense, useEffect, useRef } from "react";
+//
+import { Suspense, useEffect } from "react";
 import { CanvasGPU } from "./CanvasGPU/CanvasGPU.tsx";
-import {
-  Environment,
-  Gltf,
-  OrbitControls,
-  PerspectiveCamera,
-  Stars,
-} from "@react-three/drei";
-// import { DiamindComponent } from "./DiamondTSL/DiamondComponent.tsx";
+import { Environment, Gltf, OrbitControls } from "@react-three/drei";
 import { BloomPipeline } from "./CanvasGPU/BloomPipeline.tsx";
-import { useFrame, useThree } from "@react-three/fiber";
-import { Color, FogExp2, Matrix4, Object3D, Scene } from "three";
-import { color, fog, rangeFog, rangeFogFactor } from "three/tsl";
+import { useThree } from "@react-three/fiber";
+import { Color, Matrix4 } from "three";
+import { color, fog, rangeFogFactor } from "three/tsl";
 import { ObjectWater } from "./Objects/ObjectWater.tsx";
 
 function App() {
   return (
     <>
       <CanvasGPU webgpu>
+        <Fog></Fog>
+        <CamRig></CamRig>
+        <ObjectWater></ObjectWater>
+
         <Suspense fallback={null}>
-          <Fog></Fog>
           <Gltf scale={1} src={`/config/hongkong-transformed.glb`}></Gltf>
 
-          <ObjectWater></ObjectWater>
-
-          <OrbitControls makeDefault></OrbitControls>
+          <OrbitControls
+            //
+            enableZoom={true}
+            enablePan={false}
+            makeDefault
+          ></OrbitControls>
 
           <Environment environmentIntensity={0.5} files={[`/hdr/sky.hdr`]} />
-          <BloomPipeline />
         </Suspense>
+
+        <BloomPipeline />
       </CanvasGPU>
     </>
   );
 }
 
 function Fog() {
-  const camera: any = useThree((r) => r.camera);
   const scene: any = useThree((r) => r.scene);
+  useEffect(() => {
+    if (!scene) {
+      return;
+    }
+    if (scene) {
+      //
+      const skyColor = "#6df3ff";
+      scene.fogNode = fog(
+        color(new Color(skyColor)),
+        rangeFogFactor(750, 1500),
+      );
+      scene.backgroundNode = color(new Color(skyColor));
+    }
+  }, [scene]);
+
+  return null;
+}
+
+function CamRig() {
+  const camera: any = useThree((r) => r.camera);
 
   useEffect(() => {
     if (!camera) {
@@ -51,8 +71,7 @@ function Fog() {
       -136.6004999600759, 272.606995275635, 755.4517743435046, 1,
     ]);
 
-    const o3 = camera;
-    m4.decompose(o3.position, o3.quaternion, o3.scale);
+    m4.decompose(camera.position, camera.quaternion, camera.scale);
 
     camera.fov = 50;
     camera.far = 15000;
@@ -60,20 +79,6 @@ function Fog() {
     camera.updateProjectionMatrix();
   }, [camera]);
 
-  useEffect(() => {
-    if (!scene) {
-      return;
-    }
-    if (scene) {
-      //
-      const skyColor = "#6df3ff";
-      scene.fogNode = fog(
-        color(new Color(skyColor)),
-        rangeFogFactor(1000, 1500),
-      );
-      scene.backgroundNode = color(new Color(skyColor));
-    }
-  }, [scene]);
   return null;
 }
 //
